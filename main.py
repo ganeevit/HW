@@ -11,7 +11,7 @@ spark = SparkSession.builder.appName("crime_analysis").getOrCreate()
 
 # Read the CSV files
 crimes = spark.read.option("header", "true").option("delimiter", ",").option("quote", "\"").option("escape", "\"").option("inferSchema", "true").csv(os.path.join(input_path1, "crime.csv")).filter(col("DISTRICT").isNotNull()).distinct()
-codes = spark.read.option("header", "true").option("delimiter", ",").option("quote", "\"").option("escape", "\"").option("inferSchema", "true").csv(os.path.join(input_path1, "offense_codes.csv")).groupBy("CODE").agg(max("NAME")).distinct()
+codes = spark.read.option("header", "true").option("delimiter", ",").option("quote", "\"").option("escape", "\"").option("inferSchema", "true").csv(os.path.join(input_path1, "offense_codes.csv")).groupBy("CODE").agg(max("NAME").alias("NAME")).distinct()
 
 # Temporary tables
 part1_count = crimes.groupBy("DISTRICT", "YEAR", "MONTH").agg(count("INCIDENT_NUMBER").alias("CRIMES_COUNT")).groupBy("DISTRICT").agg(sum("CRIMES_COUNT").alias("CRIMES_TOTAL"), expr("percentile_approx(CRIMES_COUNT, 0.5)").alias("CRIMES_MONTHLY"))
